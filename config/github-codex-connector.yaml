@@ -1,0 +1,184 @@
+## GitHub/Codex Connector Configuration
+## This configuration file sets up the integration between GitHub and Codex for the grocery orchestrator
+
+# GitHub Configuration
+github:
+  # GitHub API authentication
+  auth:
+    # Use personal access token (PAT) or OAuth token
+    token: ${GITHUB_TOKEN}
+    # Alternative: use username and password (less secure, not recommended)
+    # username: ${GITHUB_USERNAME}
+    # password: ${GITHUB_PASSWORD}
+  
+  # GitHub API endpoint
+  api:
+    base_url: "https://api.github.com"
+    # API version
+    version: "v3"
+    # Request timeout in seconds
+    timeout: 30
+  
+  # Repository settings
+  repository:
+    owner: "soumalyachowdhury"
+    name: "grocery_orchestrator"
+    # Branch to monitor (optional)
+    branch: "main"
+  
+  # Webhook configuration (optional)
+  webhook:
+    # Enable webhooks
+    enabled: false
+    # Webhook endpoint URL
+    endpoint: "https://your-domain.com/webhooks/github"
+    # Webhook events to listen for
+    events:
+      - "push"
+      - "pull_request"
+      - "issues"
+  
+  # Rate limiting
+  rate_limit:
+    # Max requests per hour
+    max_requests_per_hour: 5000
+    # Retry on rate limit
+    retry_on_limit: true
+
+# Codex Configuration
+codex:
+  # Codex API authentication
+  auth:
+    api_key: ${CODEX_API_KEY}
+    # Organization ID (if applicable)
+    org_id: ${CODEX_ORG_ID}
+  
+  # Codex API endpoint
+  api:
+    base_url: "https://api.codex.example.com"
+    # API version
+    version: "v1"
+    # Request timeout in seconds
+    timeout: 30
+  
+  # Model configuration
+  model:
+    # Model name/version to use
+    name: "codex-orchestrator"
+    # Temperature for response generation (0.0 - 1.0)
+    temperature: 0.7
+    # Max tokens in response
+    max_tokens: 2048
+    # Top-p (nucleus sampling) parameter
+    top_p: 0.95
+  
+  # Prompt configuration
+  prompts:
+    # System prompt for the orchestrator
+    system_prompt: "You are a grocery customer chat orchestrator. Help customers with their grocery shopping inquiries."
+    # Custom prompt templates
+    templates:
+      - name: "order_assistance"
+        description: "Help customer with order placement"
+      - name: "inventory_check"
+        description: "Check product availability"
+
+# Connector Integration Settings
+connector:
+  # Enable/disable the connector
+  enabled: true
+  
+  # Logging configuration
+  logging:
+    # Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL
+    level: "INFO"
+    # Log file path
+    file: "logs/github-codex-connector.log"
+    # Max log file size in MB
+    max_file_size: 10
+    # Number of backup log files to keep
+    backup_count: 5
+  
+  # Sync configuration
+  sync:
+    # Enable automatic syncing
+    enabled: true
+    # Sync interval in seconds
+    interval: 3600
+    # Sync on startup
+    on_startup: true
+  
+  # Cache configuration
+  cache:
+    # Enable caching
+    enabled: true
+    # Cache TTL in seconds
+    ttl: 1800
+    # Cache backend: memory, redis
+    backend: "memory"
+    # Redis configuration (if backend is redis)
+    # redis:
+    #   host: "localhost"
+    #   port: 6379
+    #   db: 0
+  
+  # Error handling
+  error_handling:
+    # Retry failed requests
+    retry_enabled: true
+    # Max retries
+    max_retries: 3
+    # Retry delay in seconds (exponential backoff)
+    retry_delay: 5
+    # Continue on error (don't halt on failures)
+    continue_on_error: true
+  
+  # Data mapping
+  data_mapping:
+    # Map GitHub fields to Codex payload
+    github_to_codex:
+      repository_name: "source_repo"
+      issue_title: "query"
+      issue_body: "context"
+      pull_request_title: "change_description"
+    
+    # Map Codex response to GitHub
+    codex_to_github:
+      response: "comment_body"
+      suggestions: "review_comments"
+
+# Security Settings
+security:
+  # SSL/TLS verification
+  ssl_verify: true
+  # Custom CA certificate path (optional)
+  # ca_cert_path: "/path/to/ca-bundle.crt"
+  
+  # Rate limiting per IP
+  ip_rate_limit:
+    enabled: false
+    requests_per_minute: 60
+  
+  # API key rotation
+  key_rotation:
+    enabled: false
+    interval_days: 90
+
+# Advanced Settings
+advanced:
+  # Concurrent request limit
+  max_concurrent_requests: 10
+  
+  # Request queue size
+  queue_size: 1000
+  
+  # Timeout for long-running operations (seconds)
+  operation_timeout: 300
+  
+  # Enable debug mode
+  debug: false
+  
+  # Custom headers for API requests
+  custom_headers:
+    User-Agent: "GroceryOrchestratorConnector/1.0"
+    X-Custom-Header: "custom-value"
