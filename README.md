@@ -246,3 +246,7 @@ http://127.0.0.1:3000/api/customer-id?query=soumalya
 ```
 
 If `OPENAI_API_KEY` is not set or the OpenAI call fails, the chatbot falls back to the local parser so the app remains testable.
+
+## Connector Docs
+
+This repository also includes optional GitHub/Codex connector configuration notes under `config/`.
