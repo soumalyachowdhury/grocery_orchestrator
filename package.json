@@ -1,0 +1,12 @@
+{
+  "name": "grocery-orchestrator",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Grocery chatbot orchestrator with a Twilio WhatsApp webhook bridge.",
+  "scripts": {
+    "start:twilio-whatsapp": "node node_server/twilio_whatsapp_server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -9,4 +9,6 @@ venv/
 dist/
 build/
 *.egg-info/
-
+*.zip
+*.log
+grocery_orchestrator/

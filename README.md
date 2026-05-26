@@ -32,6 +32,8 @@ app/
     chatbot_agent.py       Single chatbot agent that answers and calls customer API
 customer_agent_server/
   main.py                  Mock customer lookup API on port 3000
+node_server/
+  twilio_whatsapp_server.js Twilio WhatsApp webhook bridge for Node.js
 tests/
   test_orchestrator.py     Unit tests for routing behavior
 ```
@@ -182,6 +184,47 @@ SpeechResult=get customer details for CUST10045
 ```
 
 It returns TwiML with both `<Message>` and `<Say>` using the chatbot's text response.
+
+Twilio WhatsApp webhook through Node.js:
+
+Start the customer lookup agent and Python chatbot orchestrator first. Then start the Node.js WhatsApp bridge:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\run-twilio-whatsapp.ps1
+```
+
+Or run Node directly:
+
+```powershell
+node .\node_server\twilio_whatsapp_server.js
+```
+
+Configure the Twilio WhatsApp sandbox or WhatsApp sender inbound webhook to:
+
+```text
+POST https://<your-public-url>/webhooks/twilio/whatsapp
+```
+
+For local testing, expose port `8080` with a tunnel such as ngrok and point Twilio to the public URL. The bridge reads Twilio's `From=whatsapp:+12016588874`, converts it to `2016588874`, and first sends that phone number to the orchestrator as the session identity. After the customer is identified, every WhatsApp message is forwarded to `/api/chat` with a stable session ID based on the WhatsApp sender.
+
+If the orchestrator returns selectable options, the WhatsApp reply includes numbered choices. The customer can reply `1`, `2`, `3`, and the Node bridge sends the matching action back to the orchestrator.
+
+Local webhook test:
+
+```powershell
+Invoke-RestMethod -Method Post `
+  -Uri http://127.0.0.1:8080/webhooks/twilio/whatsapp `
+  -ContentType "application/x-www-form-urlencoded" `
+  -Body "From=whatsapp:%2B12016588874&Body=show%20me%20items%20to%20buy%20and%20check%20prices"
+```
+
+Configuration:
+
+| Name | Default | Purpose |
+| --- | --- | --- |
+| `TWILIO_WHATSAPP_PORT` | `8080` | Local port for the Node.js WhatsApp bridge |
+| `ORCHESTRATOR_API_URL` | `http://127.0.0.1:8000/api/chat` | Python orchestrator chat endpoint used by the bridge |
+| `MAX_TWILIO_BODY_BYTES` | `1048576` | Maximum accepted Twilio webhook body size |
 
 ## Run Tests
 
